@@ -15,6 +15,8 @@ class Battle:
         self.winner = -1
 
     def processBattle(self):
+        for c in chars:
+            c.calcStats()
         while not self.finished:
             self.doTurn()
             state = self.checkWin()

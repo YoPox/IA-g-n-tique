@@ -3,36 +3,32 @@ from util import *
 from perso import *
 from team import *
 from battle import *
+from turn import *
 import random
 import time
 
-stats = [0, 0]
+# Constantes
+NB = 1000  # Nombre de teams
+MU = 0.05  # Pourcentage de mutation
+TN = 20  # Nombre de tournois
+AL = NB / 50  # Nombre d'équipes aléatoires ajoutées au repeuplement
+GN = 100 # Nombre de générations
 
-for a in range(500):
+# On crée les teams de la génération 1
+global teams
+teams = [Team() for i in range(NB)]
 
-    t1 = Team()
-    t2 = Team()
-    t1.shuffleP()
-    t1.getReady()
-    t1.name = "Team aléatoire 1"
-    t2.shuffleP()
-    t2.getReady()
-    t2.name = "Team aléatoire 2"
+# On choisit les persos aléatoirement
+for t in teams:
+    t.shuffle()
+    t.getReady()
 
-    teams1 = [t1, t2]
+# On va jusqu'à GN générations
+for a in range(GN):
 
-    b = Battle([teams1[0].p[0], teams1[0].p[1], teams1[0].p[2],
-                teams1[1].p[0], teams1[1].p[1], teams1[1].p[2]])
-    b.processBattle()
+    print("GÉNÉRATION " + str(a))
 
-    stats[b.winner] += 1
-
-    teams1[0].getReady()
-    teams1[1].getReady()
-
-    b2 = Battle([teams1[1].p[0], teams1[1].p[1], teams1[1].p[2],
-                teams1[0].p[0], teams1[0].p[1], teams1[0].p[2]])
-    b2.processBattle()
-    stats[1 - b2.winner] += 1
-
-print(stats)
+    # On fait les TN tournois
+    for b in range(TN):
+        tmt = Turnament(random.sample(range(NB), 100))
+        tmt.process()
