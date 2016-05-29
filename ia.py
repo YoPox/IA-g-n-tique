@@ -8,14 +8,14 @@ import random
 import time
 
 # Constantes
-NB = 1000  # Nombre de teams
+NB = 100  # Nombre de teams
+DV = 10
 MU = 0.05  # Pourcentage de mutation
-TN = 20  # Nombre de tournois
+TN = 5  # Nombre de tournois
 AL = NB / 50  # Nombre d'équipes aléatoires ajoutées au repeuplement
-GN = 100 # Nombre de générations
+GN = 1  # Nombre de générations
 
 # On crée les teams de la génération 1
-global teams
 teams = [Team() for i in range(NB)]
 
 # On choisit les persos aléatoirement
@@ -28,7 +28,11 @@ for a in range(GN):
 
     print("GÉNÉRATION " + str(a))
 
-    # On fait les TN tournois
-    for b in range(TN):
-        tmt = Turnament(random.sample(range(NB), 100))
-        tmt.process()
+    for t in range(TN):
+        print("—————")
+        alea = random.sample(range(NB), NB)
+        partitions = [alea[DV * j:DV * (j + 1)] for j in range(NB // DV)]
+        for i in range(NB // DV):
+            print(partitions[i])
+            tmt = Turnament([teams[k] for k in partitions[i]])
+            tmt.process()
