@@ -17,20 +17,26 @@ class Turnament:
 
         for a in range(len(self.teams)):
             for b in range(len(self.teams)):
-                result = []
                 if a != b:
 
-                    # # Manche 1
-                    # b = Battle([self.teams[a].p[0], self.teams[a].p[1], self.teams[a].p[2],
-                    #             self.teams[b].p[0], self.teams[b].p[1], self.teams[b].p[2]])
-                    # b.processBattle()
-                    # result.append(b.winner)
-                    #
-                    # # Manche 2
-                    # b = Battle([self.teams[b].p[0], self.teams[a].p[b], self.teams[b].p[2],
-                    #             self.teams[a].p[0], self.teams[a].p[1], self.teams[a].p[2]])
-                    # b.processBattle()
-                    # result.append(1 - b.winner)
+                    fitness = 0
 
-                    # TODO: calcul du fitness
-                    pass
+                    self.teams[a].getReady()
+                    self.teams[b].getReady()
+
+                    # Manche 1
+                    btl = Battle(self.teams[a].p + self.teams[b].p)
+                    btl.processBattle()
+
+                    self.teams[a].fitnessStep(btl.winner, sum([self.teams[b].p[i].battleStats[0] for i in range(3)])/sum([self.teams[b].p[i].stats[0] for i in range(3)]), btl.turn)
+                    self.teams[b].fitnessStep(1 - btl.winner, sum([self.teams[a].p[i].battleStats[0] for i in range(3)])/sum([self.teams[a].p[i].stats[0] for i in range(3)]), btl.turn)
+
+                    self.teams[a].getReady()
+                    self.teams[b].getReady()
+
+                    # Manche 2
+                    btl = Battle(self.teams[b].p + self.teams[a].p)
+                    btl.processBattle()
+
+                    self.teams[a].fitnessStep(btl.winner, sum([self.teams[b].p[i].battleStats[0] for i in range(3)])/sum([self.teams[b].p[i].stats[0] for i in range(3)]), btl.turn)
+                    self.teams[b].fitnessStep(1 - btl.winner, sum([self.teams[a].p[i].battleStats[0] for i in range(3)])/sum([self.teams[a].p[i].stats[0] for i in range(3)]), btl.turn)

@@ -138,8 +138,8 @@ class Battle:
 
     def checkWin(self):
         if not self.chars[0].alive and not self.chars[1].alive and not self.chars[2].alive:
-            return [True, 1]
-        elif not self.chars[3].alive and not self.chars[4].alive and not self.chars[5].alive:
             return [True, 0]
+        elif not self.chars[3].alive and not self.chars[4].alive and not self.chars[5].alive:
+            return [True, 1]
         else:
             return [False]
