@@ -20,6 +20,13 @@ class Team:
         self.BETA = 1
         self.GAMMA = 1
 
+    def __call__(self):
+        print("—————————————————")
+        print(self.fitness)
+        print(str(self.victoires / (self.victoires + self.defaites) * 100) + " %")
+        for perso in self.p:
+            perso()
+
     # Calcule baseStats pour chaque personnage
     def getReady(self):
         for i in range(len(self.p)):
@@ -28,11 +35,8 @@ class Team:
     def shuffle(self):
         for i in range(len(self.p)):
             self.p[i].classe = random.randint(0, 6)
-
-    def dispFitness(self):
-        print(str(self.fitness) + " - " + self.nom +
-              " (" + classes[self.p[0].classe] + " - " + classes[self.p[1].classe] +
-              " - " + classes[self.p[2].classe] + ")")
+            for a in range(5):
+                self.p[i].ia.addRule()
 
     def fitnessStep(self, won, s, tours):
         if won:
@@ -45,6 +49,6 @@ class Team:
         self.sommeTours += tours
 
     def calcFitness(self):
-        self.fitness = ((1 + self.victoires) / (1 + self.defaites)) ** self.ALPHA \
-                     * (self.sommeVie / self.sommeTours) ** self.BETA \
-                     * (self.sommeDeg * self.sommeTours / (1 + self.defaites) ** 2) ** self.GAMMA
+        self.fitness = ((self.victoires) / (self.victoires + self.defaites)) ** self.ALPHA \
+            * (self.sommeVie / self.sommeTours) ** self.BETA \
+            * (self.sommeDeg * self.sommeTours / (1 + self.defaites) ** 2) ** self.GAMMA

@@ -28,8 +28,9 @@ class Turnament:
                     btl = Battle(self.teams[a].p + self.teams[b].p)
                     btl.processBattle()
 
-                    self.teams[a].fitnessStep(btl.winner, sum([self.teams[b].p[i].battleStats[0] for i in range(3)])/sum([self.teams[b].p[i].stats[0] for i in range(3)]), btl.turn)
-                    self.teams[b].fitnessStep(1 - btl.winner, sum([self.teams[a].p[i].battleStats[0] for i in range(3)])/sum([self.teams[a].p[i].stats[0] for i in range(3)]), btl.turn)
+                    if btl.winner >= 0: # En cas de match nul
+                        self.teams[a].fitnessStep(btl.winner, sum([self.teams[b].p[i].battleStats[0] for i in range(3)])/sum([self.teams[b].p[i].stats[0] for i in range(3)]), btl.turn)
+                        self.teams[b].fitnessStep(1 - btl.winner, sum([self.teams[a].p[i].battleStats[0] for i in range(3)])/sum([self.teams[a].p[i].stats[0] for i in range(3)]), btl.turn)
 
                     self.teams[a].getReady()
                     self.teams[b].getReady()
@@ -38,5 +39,6 @@ class Turnament:
                     btl = Battle(self.teams[b].p + self.teams[a].p)
                     btl.processBattle()
 
-                    self.teams[a].fitnessStep(btl.winner, sum([self.teams[b].p[i].battleStats[0] for i in range(3)])/sum([self.teams[b].p[i].stats[0] for i in range(3)]), btl.turn)
-                    self.teams[b].fitnessStep(1 - btl.winner, sum([self.teams[a].p[i].battleStats[0] for i in range(3)])/sum([self.teams[a].p[i].stats[0] for i in range(3)]), btl.turn)
+                    if btl.winner >= 0:
+                        self.teams[a].fitnessStep(1 - btl.winner, sum([self.teams[b].p[i].battleStats[0] for i in range(3)])/sum([self.teams[b].p[i].stats[0] for i in range(3)]), btl.turn)
+                        self.teams[b].fitnessStep(1 - btl.winner, sum([self.teams[a].p[i].battleStats[0] for i in range(3)])/sum([self.teams[a].p[i].stats[0] for i in range(3)]), btl.turn)

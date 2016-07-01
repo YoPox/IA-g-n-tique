@@ -1,50 +1,83 @@
 import numpy as np
 from util import *
-from perso import *
-from team import *
-from battle import *
-from turn import *
+from runes import *
 import random
-import time
+import re
 
-# Constantes
-NB = 20  # Nombre de teams
-SE = NB // 10  # Meilleures teams conservées
-DV = 10
-MU = 0.05  # Pourcentage de mutation
-TN = 1  # Nombre de tournois
-AL = NB / 50  # Nombre d'équipes aléatoires ajoutées au repeuplement
-GN = 1  # Nombre de générations
 
-# On crée les teams de la génération 1
-teams = [Team() for i in range(NB)]
-for i in range(len(teams)):
-    teams[i].nom = "Team #" + str(i)
+class IA:
 
-# On choisit les persos aléatoirement
-for t in teams:
-    t.shuffle()
-    t.getReady()
+    def __init__(self, perso):
+        self.p = perso
+        self.rules = []
 
-# On va jusqu'à GN générations
-for a in range(GN):
+    def __call__(self, chars, nb, turn):
+        if self.p.alive and self.p.idle == 0:
 
-    print("GÉNÉRATION " + str(a))
+            # On interroge les portes logiques succesivement
+            for rule in self.rules:
+                if rule([chars, nb, turn]):
+                    return rule.getAction([chars, nb, turn])
 
-    for t in range(TN):
-        alea = random.sample(range(NB), NB)
-        partitions = [alea[DV * j:DV * (j + 1)] for j in range(NB // DV)]
-        for i in range(NB // DV):
-            tmt = Turnament([teams[k] for k in partitions[i]])
-            tmt.process()
+            # Fallback
+            return [actionFallback]
 
-    for t in teams:
-        t.calcFitness()
+        elif self.p.idle > 0:
+            self.p.idle -= 1
+            return []
 
-    # On trie les teams
-    teams.sort(key=lambda x: x.fitness)
+    def setRule(n, rule):
+        if len(runes) > n:
+            self.rules[n] = rule
 
-    # teams = [teams[i] for i in range(SE)]
+    def addRule(self,
+                idPl=-1,
+                idC1=-1,
+                idC2=-1,
+                idC=-1,
+                idA=-1):
 
-    for t in teams:
-        t.dispFitness()
+        if idPl == -1:
+            idPl = int(random.random() * len(funLog))
+        if idC1 == -1:
+            idC1 = int(random.random() * len(idCond))
+        if idC2 == -1:
+            idC2 = int(random.random() * len(idCond))
+        if idC == -1:
+            idC = idCible[int(random.random() * len(idCible))]
+        if idA == -1:
+            idA = idAction[int(random.random() * len(idAction))]
+
+        # Pour l'instant : seulement attaquer ou défendre
+
+        if random.random() >= 0.5:
+            idA = "swing"
+        else:
+            idA = "defend"
+
+        if actionNeedCible[idA]:
+            runeCible = Cible(idC, idC)
+            runeAction = Action(idA, idA, True, runeCible)
+        else:
+            runeAction = Action(idA, idA, False)
+
+        if idCond[idC1] in condParam100:
+            param = int(random.random() * 100)
+            runeCond1 = Cond(re.sub('X', str(param) + "%", idCond[idC1]), idC1, param)
+        elif idCond[idC1] == "eachXTurn":
+            param = int(random.random() * 4) + 2
+            runeCond1 = Cond(re.sub('X', str(param), idCond[idC1]), idC1, param)
+        else:
+            runeCond1 = Cond(idCond[idC1], idC1)
+
+        if idCond[idC2] in condParam100:
+            param = int(random.random() * 100)
+            runeCond2 = Cond(re.sub('X', str(param) + "%", idCond[idC2]), idC2, param)
+        elif idCond[idC2] == "eachXTurn":
+            param = int(random.random() * 4) + 2
+            runeCond2 = Cond(re.sub('X', str(param), idCond[idC2]), idC2, param)
+        else:
+            runeCond2 = Cond(idCond[idC2], idC2)
+
+        self.rules.append(PorteLogique(
+            nomLog[idPl], idPl, runeAction, runeCond1, runeCond2))
